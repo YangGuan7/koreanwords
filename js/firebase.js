@@ -43,3 +43,6 @@ export function fetchData() {
         throw error;
     });
 }
+
+// 確保正確導出 app
+export { app };
