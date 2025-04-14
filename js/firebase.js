@@ -24,22 +24,22 @@ const analytics = getAnalytics(app);
 // 初始化資料庫
 const db = getDatabase(app);
 
-// 抓取資料庫資料
-function fetchData() {
-    const dbRef = ref(db, 'your-database-path'); // 這裡填入你的資料庫路徑
-    get(dbRef).then((snapshot) => {
+// 抓取資料庫資料的函數
+export function fetchData() {
+    // 指定資料庫路徑（對應到 '單字' 節點）
+    const dbRef = ref(db, '單字');
+
+    // 讀取資料
+    return get(dbRef).then((snapshot) => {
         if (snapshot.exists()) {
-            console.log("資料庫內容：", snapshot.val());
+            // 資料存在，返回資料
+            return snapshot.val();
         } else {
-            console.log("資料庫中沒有資料");
+            // 資料庫中沒有資料
+            throw new Error("資料庫中沒有資料");
         }
     }).catch((error) => {
         console.error("資料庫讀取錯誤：", error);
+        throw error;
     });
 }
-
-// 初始化時抓取資料
-fetchData();
-
-// 導出 Firebase
-export { app, analytics, fetchData };
