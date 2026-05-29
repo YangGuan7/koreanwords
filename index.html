@@ -1,26 +1,61 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>韓文刷卡單字</title>
-<link rel="stylesheet" href="./Content/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>韓文刷卡單字</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="./Content/style.css">
 </head>
 <body>
-<h1>韓文單字刷卡</h1>
 
-<div class="card hide" id="flashCard">
-  <div class="cardInner">
-    <div class="cardFace cardFront" id="frontWord">中文</div>
-    <div class="cardFace cardBack" id="backWord">KR</div>
+  <div class="app-container">
+    <header>
+      <h1>韓文單字刷卡</h1>
+    </header>
+
+    <main class="quiz-container">
+      
+      <div class="overlay-welcome" id="welcomeScreen">
+        <button id="startBtn" class="btn-primary">開始練習</button>
+      </div>
+
+      <div class="card-wrapper">
+  <div class="card hide" id="flashCard">
+    <button id="ttsBtn" class="tts-btn" aria-label="發音">
+      <i class="fa-solid fa-volume-high"></i>
+    </button>
+
+    <div class="card-overlay overlay-known"><i class="fa-regular fa-circle"></i></div>
+    <div class="card-overlay overlay-weak"><i class="fa-solid fa-xmark"></i></div>
+    <div class="card-overlay overlay-unsure"><i class="fa-solid fa-triangle-exclamation"></i></div>
+
+    <div class="cardInner">
+      <div class="cardFace cardFront">
+        <div class="word-tag" id="frontTag"></div>
+        <div class="word-text" id="frontWord">中文</div>
+        <div class="tap-hint">點擊翻面</div>
+      </div>
+      <div class="cardFace cardBack">
+        <div class="word-text" id="backWord">KR</div>
+        <div class="tap-hint">點擊翻回</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<button id="startBtn">開始練習</button>
+      <div class="action-hints">
+        <span class="hint-item left"><i class="fa-solid fa-arrow-left"></i> 不熟</span>
+        <span class="hint-item down"><i class="fa-solid fa-arrow-down"></i> 不確定</span>
+        <span class="hint-item right">熟悉 <i class="fa-solid fa-arrow-right"></i></span>
+      </div>
 
-<script type="module" src="./js/firebase.js"></script>
-<script type="module" src="./js/pushData.js"></script>
-<script type="module" src="./js/quiz.js"></script>
-<script type="module" src="./js/script.js"></script>
+    </main>
+  </div>
+
+  <script type="module" src="./js/firebase.js"></script>
+  <script type="module" src="./js/pushData.js"></script>
+  <script type="module" src="./js/quiz.js"></script>
+  <script type="module" src="./js/script.js"></script>
 </body>
 </html>
