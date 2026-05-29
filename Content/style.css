@@ -1,41 +1,182 @@
+/* ==========================================
+   🐳 🥫ㄉ單字卡：日系海鹽汽水粉藍風 (帶星星特效)
+   ========================================== */
+
 :root {
-    --primary-color: #4f46e5;
-    --bg-color: #f8fafc;
+    --primary-color: #7bc1eb;
+    /* 蘇打汽水粉藍 */
+    --secondary-color: #a5d8f3;
+    /* 輕柔淺天藍 */
+    --bg-color: #f2f9ff;
+    /* 可愛寶寶藍底色 */
     --card-front-bg: #ffffff;
-    --card-back-bg: #eff6ff;
-    --text-main: #1e293b;
-    --text-sub: #94a3b8;
+    /* 棉花糖純白 */
+    --card-back-bg: #f7fbff;
+    /* 淡淡湖水藍 */
+    --text-main: #4a5568;
+    /* 質感深石墨灰（柔和不刺眼） */
+    --text-sub: #90a4ae;
+    /* 燕麥藍灰 */
+
+    /* 空氣感手勢顏色 */
+    --color-known: #a7f3d0;
+    --color-known-text: rgba(46, 125, 50, 0.15);
+    --color-weak: #fecdd3;
+    --color-weak-text: rgba(211, 47, 47, 0.15);
+    --color-unsure: #bae6fd;
+    --color-unsure-text: rgba(25, 118, 210, 0.15);
 }
 
+/* 網頁基礎設定 */
+/* ==========================================
+   🐳 網格 + 圍繞在卡片四周的特大號星星背景
+   ========================================== */
+
+/* 網頁基礎設定 */
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg-color);
+    font-family: 'M PLUS Rounded 1c', "Noto Sans TC", "Microsoft JhengHei", sans-serif;
     color: var(--text-main);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     overflow: hidden;
+    letter-spacing: 0.5px;
+
+    /* 網格漸層基礎 */
+    background-color: var(--bg-color);
+    background-image:
+        linear-gradient(rgba(123, 193, 235, 0.06) 1.5px, transparent 1.5px),
+        linear-gradient(90deg, rgba(123, 193, 235, 0.06) 1.5px, transparent 1.5px),
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.6) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, #e0f2fe 0%, transparent 50%);
+    background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
+
+    position: relative;
 }
 
+/* 💥 實心大星星群：往中間收攏，完美點綴在卡片左右空隙 */
+body::before {
+    content: '★';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    color: #ffd166;
+    opacity: 0.3;
+    font-size: 2.6rem;
+
+    /* 🎯 調整 X 軸（左邊往右調、右邊往左調）讓牠們往中間靠 */
+    text-shadow:
+        14vw 12vh 0 rgba(255, 209, 102, 0.35),
+        /* 左上方（往內移） */
+        76vw 15vh 0 rgba(255, 209, 102, 0.35),
+        /* 右上方（往內移） */
+        12vw 48vh 0 rgba(255, 209, 102, 0.25),
+        /* 左中間 */
+        78vw 52vh 0 rgba(255, 209, 102, 0.3),
+        /* 右中間 */
+        15vw 80vh 0 rgba(255, 209, 102, 0.2);
+    /* 左下方 */
+
+    animation: bgStarBreathe 3s infinite ease-in-out;
+}
+
+/* 💥 空心大星星群：同步往內靠攏 */
+body::after {
+    content: '✧';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    color: #ffd166;
+    opacity: 0.35;
+    font-size: 2.8rem;
+
+    /* 🎯 同步把太邊邊的空心星拉回來 */
+    text-shadow:
+        50vw 8vh 0 rgba(255, 209, 102, 0.4),
+        /* 正上方偏中不變 */
+        30vw 26vh 0 rgba(255, 209, 102, 0.2),
+        /* 左上偏內 */
+        72vw 30vh 0 rgba(255, 209, 102, 0.25),
+        /* 右上偏內 */
+        75vw 76vh 0 rgba(255, 209, 102, 0.35),
+        /* 右下方 */
+        45vw 86vh 0 rgba(255, 209, 102, 0.2);
+    /* 正下方 */
+
+    animation: bgStarBreathe 4s infinite ease-in-out reverse;
+}
+
+/* 背景大星星專用呼吸動畫 */
+@keyframes bgStarBreathe {
+
+    0%,
+    100% {
+        opacity: 0.25;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.55;
+        transform: scale(1.08);
+    }
+}
+
+/* 主容器 */
 .app-container {
     width: 100%;
-    max-width: 480px;
+    max-width: 420px;
     height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 20px;
+    padding: 24px;
     box-sizing: border-box;
 }
 
+/* 可愛藍色標題 */
 header h1 {
     text-align: center;
-    font-size: 1.5rem;
-    margin: 10px 0;
+    font-size: 1.8rem;
+    margin: 20px 0;
     color: var(--primary-color);
+    text-shadow: 2px 2px 0px #fff, 4px 4px 0px #e0f2fe;
+    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
 }
 
+/* 💥 星星呼吸閃爍動畫 */
+.star-blink {
+    font-size: 1.2rem;
+    color: #ffd166;
+    /* 亮黃色小星星 */
+    animation: starBreathe 2s infinite ease-in-out;
+}
+
+@keyframes starBreathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.2) rotate(15deg);
+        opacity: 1;
+    }
+}
+
+/* 舞台區 */
 .quiz-container {
     position: relative;
     flex: 1;
@@ -45,44 +186,149 @@ header h1 {
     align-items: center;
 }
 
-/* 開始畫面遮罩 */
+/* 歡迎遮罩層 */
+/* ==========================================
+   🧁 歡迎畫面全新升級：夢幻奶油小對話框
+   ========================================== */
+
+/* 歡迎畫面大底層（加上一點點模糊，讓背後的大星星透出來，超夢幻） */
 .overlay-welcome {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--bg-color);
     z-index: 10;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
+/* 點擊開始後的縮小飛走動畫保持不變 */
+.overlay-welcome.fade-out {
+    opacity: 0;
+    transform: scale(0.85) translateY(-20px);
+    pointer-events: none;
+}
+
+/* 💥 新增：懸浮的奶油小對話框本體 */
+.welcome-box {
+    background: #ffffff;
+    border: 4px solid #fff;
+    border-radius: 32px;
+    /* 跟單字卡一樣的超圓潤邊角 */
+    padding: 35px 24px;
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(123, 193, 235, 0.2), 0 5px 15px rgba(0, 0, 0, 0.02);
+    animation: boxFloat 3s infinite ease-in-out;
+    /* 讓整個小框框像在水上漂浮一樣 */
+}
+
+/* 歡迎對話框的微弱上下漂浮動畫 */
+@keyframes boxFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+/* 對話框頂部的魔法棒大圖示 */
+.welcome-icon {
+    font-size: 2.8rem;
+    color: #ffd166;
+    /* 亮晶晶黃色 */
+    margin-bottom: 15px;
+    filter: drop-shadow(0 4px 0px rgba(123, 193, 235, 0.2));
+}
+
+/* 歡迎小標題 */
+.welcome-box h2 {
+    font-size: 1.3rem;
+    color: var(--text-main);
+    margin: 0 0 8px 0;
+    font-weight: 800;
+}
+
+/* 溫柔的手勢小提醒文字 */
+.welcome-box p {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    margin: 0 0 25px 0;
+    background: #f0f7ff;
+    padding: 6px 12px;
+    border-radius: 12px;
+    display: inline-block;
+}
+
+/* 升級後的 Q彈按鈕樣式調整 (在對話框內寬度變大更好按) */
+.welcome-box .btn-primary {
+    width: 100%;
+    /* 讓按鈕填滿盒子，大方又好看 */
+    padding: 14px;
+    font-size: 1.2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    /* 文字與紙飛機的距離 */
+}
+
+/* 藍色 Q彈大按鈕 */
 .btn-primary {
-    background: var(--primary-color);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
     border: none;
-    padding: 14px 40px;
-    font-size: 1.2rem;
-    border-radius: 30px;
+    padding: 16px 45px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 40px;
     cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
-    transition: transform 0.2s;
+    box-shadow: 0 8px 0px #5ea8d4, 0 12px 20px rgba(123, 193, 235, 0.3);
+    transition: all 0.1s ease;
 }
 
 .btn-primary:active {
-    transform: scale(0.95);
+    transform: translateY(4px);
+    box-shadow: 0 4px 0px #5ea8d4, 0 6px 10px rgba(123, 193, 235, 0.3);
 }
 
-/* 卡片容器與翻轉核心 */
+/* 讓斯搭豆按鈕裡的 Icon 帶有微Q的擺動效果 */
+.btn-primary i {
+    animation: iconWiggle 1.5s infinite ease-in-out;
+}
+
+@keyframes iconWiggle {
+
+    0%,
+    100% {
+        transform: rotate(0deg) scale(1);
+    }
+
+    50% {
+        transform: rotate(15deg) scale(1.1);
+    }
+
+    /* 微微歪頭放大 */
+}
+
+/* 卡片外殼 */
 .card-wrapper {
     width: 100%;
-    height: 400px;
-    perspective: 1000px;
-    /* 3D 透視效果 */
+    height: 380px;
+    perspective: 1200px;
 }
 
+/* 卡片主體 */
 .card {
     width: 100%;
     height: 100%;
@@ -90,9 +336,7 @@ header h1 {
     cursor: pointer;
     user-select: none;
     touch-action: none;
-    /* 停用瀏覽器預設手勢以利 PointerEvent 運作 */
     transition: transform 0.1s ease-out;
-    /* 用於滑動跟隨 */
 }
 
 .card.hide {
@@ -104,54 +348,90 @@ header h1 {
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 翻面 Class */
 .card.isFlip .cardInner {
     transform: rotateY(180deg);
 }
 
+/* 卡片正反面通用 */
 .cardFace {
     position: absolute;
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    /* 翻過去時隱藏背面 */
-    border-radius: 24px;
+    border-radius: 32px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    padding: 24px;
+    padding: 30px;
     box-sizing: border-box;
+    border: 4px solid #fff;
+    box-shadow: 0 15px 30px rgba(74, 85, 104, 0.06), 0 5px 15px rgba(74, 85, 104, 0.03);
 }
 
 .cardFront {
     background: var(--card-front-bg);
-    border: 2px solid #e2e8f0;
 }
 
 .cardBack {
     background: var(--card-back-bg);
     transform: rotateY(180deg);
-    /* 背面預先轉 180 度 */
-    border: 2px solid #bfdbfe;
+    border-color: #e0f2fe;
 }
 
+/* 單字文字 */
 .word-text {
-    font-size: 2.2rem;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-size: 2.4rem;
+    font-weight: 700;
     text-align: center;
+    color: var(--text-main);
+    word-break: break-all;
 }
 
+/* 詞性標籤貼紙 */
+.word-tag {
+    font-size: 0.85rem;
+    font-weight: bold;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 0px rgba(0, 0, 0, 0.03);
+}
+
+.tag-adj {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.tag-verb {
+    background-color: #e0f7fa;
+    color: #006064;
+}
+
+/* 戰績小貼紙 */
+.word-stats {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    margin-top: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px dashed var(--text-sub);
+}
+
+/* 點擊提示小字 */
 .tap-hint {
     position: absolute;
     bottom: 24px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-sub);
+    background: #fff;
+    padding: 2px 10px;
+    border-radius: 10px;
+    opacity: 0.7;
 }
 
 /* 右上角發音按鈕 */
@@ -160,48 +440,27 @@ header h1 {
     top: 20px;
     right: 20px;
     z-index: 5;
-    background: #f1f5f9;
-    border: none;
-    width: 44px;
-    height: 44px;
+    background: #f0f9ff;
+    border: 2px solid #e0f2fe;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: #64748b;
-    font-size: 1.2rem;
-    transition: background 0.2s, color 0.2s;
-}
-
-.tts-btn:hover {
-    background: #e2e8f0;
     color: var(--primary-color);
+    font-size: 1.2rem;
+    box-shadow: 0 4px 0px #bae6fd;
+    transition: all 0.1s;
 }
 
 .tts-btn:active {
-    transform: scale(0.9);
+    transform: translateY(2px);
+    box-shadow: 0 2px 0px #bae6fd;
 }
 
-/* 下方手勢提示 */
-.action-hints {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    margin-top: 30px;
-    padding: 0 10px;
-    box-sizing: border-box;
-}
-
-.hint-item {
-    font-size: 0.9rem;
-    color: var(--text-sub);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* 滑動狀態圖示遮罩基礎設定 */
+/* 🌿 空氣感超淺滑動提示 (OO、XX 改得更透明、更柔和) */
 .card-overlay {
     position: absolute;
     top: 0;
@@ -209,66 +468,67 @@ header h1 {
     width: 100%;
     height: 100%;
     z-index: 4;
-    /* 位在發音按鈕下方，但卡片內容上方 */
-    border-radius: 24px;
+    border-radius: 32px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 7rem;
-    /* 大大淺淺的圖示 */
+    font-size: 8rem;
     opacity: 0;
-    /* 預設完全透明 */
     pointer-events: none;
-    /* 讓滑鼠/手指事件穿透，不干擾拖曳 */
-    transition: opacity 0.1s ease-out;
+    transition: opacity 0.12s ease-out;
 }
 
-/* 右滑：熟悉 (淺綠色圈圈) */
 .overlay-known {
-    background: rgba(34, 197, 94, 0.08);
-    color: rgba(34, 197, 94, 0.4);
+    background: rgba(240, 253, 244, 0.4);
+    color: var(--color-known-text);
 }
 
-/* 左滑：不熟 (淺紅色叉叉) */
 .overlay-weak {
-    background: rgba(239, 68, 68, 0.08);
-    color: rgba(239, 68, 68, 0.4);
+    background: rgba(254, 242, 242, 0.4);
+    color: var(--color-weak-text);
 }
 
-/* 下滑：不確定 (淺藍色三角形) */
 .overlay-unsure {
-    background: rgba(59, 130, 246, 0.08);
-    color: rgba(59, 130, 246, 0.4);
+    background: rgba(240, 247, 255, 0.4);
+    color: var(--color-unsure-text);
 }
 
-/* 💥 新增：詞性標籤樣式 */
-.word-tag {
-    font-size: 0.9rem;
-    font-weight: bold;
-    padding: 4px 12px;
-    border-radius: 12px;
-    margin-bottom: 15px;
-    letter-spacing: 1px;
-    display: inline-block;
+/* 下方滑動指南 */
+.action-hints {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 25px;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
 
-/* 形容詞樣式 */
-.tag-adj {
-    background-color: #e0f2fe;
-    color: #0369a1;
-}
-
-/* 動詞樣式 */
-.tag-verb {
-    background-color: #ffedd5;
-    color: #c2410c;
-}
-
-.word-stats {
+.hint-item {
     font-size: 0.85rem;
-    color: #64748b;
-    margin-top: 15px;
-    background: rgba(0, 0, 0, 0.04);
-    padding: 4px 10px;
-    border-radius: 20px;
+    color: var(--text-sub);
+    background: rgba(144, 164, 174, 0.08);
+    padding: 6px 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* 清空進度低調鈕 */
+#resetBtn {
+    margin-top: auto;
+    margin-bottom: 10px;
+    background: none;
+    border: none;
+    color: var(--text-sub);
+    font-size: 0.8rem;
+    text-decoration: underline;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+#resetBtn:hover {
+    opacity: 1;
+    color: #d32f2f;
 }

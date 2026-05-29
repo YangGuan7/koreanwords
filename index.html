@@ -3,47 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>韓文刷卡單字</title>
+  <title>🥫ㄉ單字卡</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="./Content/style.css">
 </head>
 <body>
 
   <div class="app-container">
     <header>
-      <h1>韓文單字刷卡</h1>
+      <h1><i class="fa-solid fa-star star-blink"></i> 🥫ㄉ單字卡 <i class="fa-solid fa-star star-blink"></i></h1>
     </header>
 
     <main class="quiz-container">
       
+      <!-- 💥 重新設計：超可愛歡迎卡片遮罩 -->
       <div class="overlay-welcome" id="welcomeScreen">
-        <button id="startBtn" class="btn-primary">開始練習</button>
+        <div class="welcome-box">
+          <div class="welcome-icon">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <h2>🥫の單字遊戲</h2>
+          <p>⬅️不熟、⬇️不確定、➡️熟悉</p>
+          
+          <!-- 原本的按鈕，換上更有層次的設計 -->
+          <button id="startBtn" class="btn-primary">
+            斯搭豆<i class="fa-solid fa-ghost"></i>
+          </button>
+        </div>
       </div>
 
       <div class="card-wrapper">
-  <div class="card hide" id="flashCard">
-    <button id="ttsBtn" class="tts-btn" aria-label="發音">
-      <i class="fa-solid fa-volume-high"></i>
-    </button>
+        <div class="card hide" id="flashCard">
+          <button id="ttsBtn" class="tts-btn" aria-label="發音">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
 
-    <div class="card-overlay overlay-known"><i class="fa-regular fa-circle"></i></div>
-    <div class="card-overlay overlay-weak"><i class="fa-solid fa-xmark"></i></div>
-    <div class="card-overlay overlay-unsure"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="card-overlay overlay-known"><i class="fa-regular fa-circle"></i></div>
+          <div class="card-overlay overlay-weak"><i class="fa-solid fa-xmark"></i></div>
+          <div class="card-overlay overlay-unsure"><i class="fa-solid fa-triangle-exclamation"></i></div>
 
-    <div class="cardInner">
-      <div class="cardFace cardFront">
-        <div class="word-tag" id="frontTag"></div>
-        <div class="word-text" id="frontWord">中文</div>
-        <div class="tap-hint">點擊翻面</div>
+          <div class="cardInner">
+            <div class="cardFace cardFront">
+              <div class="word-tag" id="frontTag"></div>
+              <div class="word-text" id="frontWord">中文</div>
+              <div class="tap-hint">★ 點擊翻面 ★</div>
+            </div>
+            <div class="cardFace cardBack">
+              <div class="word-text" id="backWord">KR</div>
+              <div class="word-stats" id="backStats"></div>
+              <div class="tap-hint">★ 點擊翻回 ★</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="cardFace cardBack">
-        <div class="word-text" id="backWord">KR</div>
-        <div class="word-stats" id="backStats"></div>
-        <div class="tap-hint">點擊翻回</div>
-      </div>
-    </div>
-  </div>
-</div>
 
       <div class="action-hints">
         <span class="hint-item left"><i class="fa-solid fa-arrow-left"></i> 不熟</span>

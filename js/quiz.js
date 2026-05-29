@@ -55,14 +55,15 @@ export function renderCurrentCard() {
     // 自動判斷詞性並加上標籤
     if (frontTagEl) {
         frontTagEl.className = 'word-tag'; // 重置樣式
+        // 在 quiz.js 的 renderCurrentCard 裡找到對應地方修改：
         if (word.zh.endsWith('的') || (word.kr.endsWith('다') && !word.kr.includes(' '))) {
-            frontTagEl.textContent = '形容詞';
+            frontTagEl.textContent = '✨ 形容詞 ✨'; // 💥 加顆小星星
             frontTagEl.classList.add('tag-adj');
             frontTagEl.style.display = 'inline-block';
         } else if (word.zh.includes('開') || word.zh.includes('關') || word.kr.includes(' ')) {
-            frontTagEl.textContent = '動 詞';
+            frontTagEl.textContent = '✨ 動 詞 ✨';  // 💥 加顆小星星
             frontTagEl.classList.add('tag-verb');
-            frontTagEl.style.with = 'inline-block';
+            frontTagEl.style.display = 'inline-block';
         } else {
             frontTagEl.style.display = 'none';
         }
