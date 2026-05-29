@@ -1,24 +1,13 @@
-/* ==========================================
-   🐳 🥫ㄉ單字卡：日系海鹽汽水粉藍風 (帶星星特效)
-   ========================================== */
+/* 🐳 🥫ㄉ單字卡*/
 
 :root {
     --primary-color: #7bc1eb;
-    /* 蘇打汽水粉藍 */
     --secondary-color: #a5d8f3;
-    /* 輕柔淺天藍 */
     --bg-color: #f2f9ff;
-    /* 可愛寶寶藍底色 */
     --card-front-bg: #ffffff;
-    /* 棉花糖純白 */
     --card-back-bg: #f7fbff;
-    /* 淡淡湖水藍 */
     --text-main: #4a5568;
-    /* 質感深石墨灰（柔和不刺眼） */
     --text-sub: #90a4ae;
-    /* 燕麥藍灰 */
-
-    /* 空氣感手勢顏色 */
     --color-known: #a7f3d0;
     --color-known-text: rgba(46, 125, 50, 0.15);
     --color-weak: #fecdd3;
@@ -27,12 +16,7 @@
     --color-unsure-text: rgba(25, 118, 210, 0.15);
 }
 
-/* 網頁基礎設定 */
-/* ==========================================
-   🐳 網格 + 圍繞在卡片四周的特大號星星背景
-   ========================================== */
 
-/* 網頁基礎設定 */
 body {
     margin: 0;
     font-family: 'M PLUS Rounded 1c', "Noto Sans TC", "Microsoft JhengHei", sans-serif;
@@ -42,11 +26,9 @@ body {
     align-items: center;
     min-height: 100vh;
 
-    /* 💥 核心修正 1：防止手機瀏覽器橡皮筋特效與側滑返回 */
     overflow: hidden;
     touch-action: none;
     position: fixed;
-    /* 鎖死底層，不讓網頁隨手指滾動 */
     width: 100%;
     height: 100%;
 
@@ -59,7 +41,7 @@ body {
     background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
 }
 
-/* 💥 實心大星星群：往中間收攏，完美點綴在卡片左右空隙 */
+/* 💥 實心大星星群 */
 body::before {
     content: '★';
     position: absolute;
@@ -72,7 +54,6 @@ body::before {
     opacity: 0.3;
     font-size: 2.6rem;
 
-    /* 🎯 調整 X 軸（左邊往右調、右邊往左調）讓牠們往中間靠 */
     text-shadow:
         14vw 12vh 0 rgba(255, 209, 102, 0.35),
         /* 左上方（往內移） */
@@ -88,7 +69,7 @@ body::before {
     animation: bgStarBreathe 3s infinite ease-in-out;
 }
 
-/* 💥 空心大星星群：同步往內靠攏 */
+/* 💥 空心大星星群 */
 body::after {
     content: '✧';
     position: absolute;
@@ -101,7 +82,6 @@ body::after {
     opacity: 0.35;
     font-size: 2.8rem;
 
-    /* 🎯 同步把太邊邊的空心星拉回來 */
     text-shadow:
         50vw 8vh 0 rgba(255, 209, 102, 0.4),
         /* 正上方偏中不變 */
@@ -117,7 +97,6 @@ body::after {
     animation: bgStarBreathe 4s infinite ease-in-out reverse;
 }
 
-/* 背景大星星專用呼吸動畫 */
 @keyframes bgStarBreathe {
 
     0%,
@@ -132,7 +111,6 @@ body::after {
     }
 }
 
-/* 主容器 */
 .app-container {
     width: 100%;
     max-width: 420px;
@@ -143,7 +121,7 @@ body::after {
     box-sizing: border-box;
 }
 
-/* 可愛藍色標題 */
+/* 標題 */
 header h1 {
     text-align: center;
     font-size: 1.8rem;
@@ -157,7 +135,7 @@ header h1 {
     gap: 10px;
 }
 
-/* 💥 星星呼吸閃爍動畫 */
+/* 💥 星星閃爍動畫 */
 .star-blink {
     font-size: 1.2rem;
     color: #ffd166;
@@ -179,7 +157,7 @@ header h1 {
     }
 }
 
-/* 舞台區 */
+/* 舞台 */
 .quiz-container {
     position: relative;
     flex: 1;
@@ -190,11 +168,6 @@ header h1 {
 }
 
 /* 歡迎遮罩層 */
-/* ==========================================
-   🧁 歡迎畫面全新升級：夢幻奶油小對話框
-   ========================================== */
-
-/* 歡迎畫面大底層（加上一點點模糊，讓背後的大星星透出來，超夢幻） */
 .overlay-welcome {
     position: absolute;
     top: 0;
@@ -210,14 +183,12 @@ header h1 {
     box-sizing: border-box;
 }
 
-/* 點擊開始後的縮小飛走動畫保持不變 */
 .overlay-welcome.fade-out {
     opacity: 0;
     transform: scale(0.85) translateY(-20px);
     pointer-events: none;
 }
 
-/* 💥 新增：懸浮的奶油小對話框本體 */
 .welcome-box {
     background: #ffffff;
     border: 4px solid #fff;
@@ -229,10 +200,8 @@ header h1 {
     text-align: center;
     box-shadow: 0 20px 40px rgba(123, 193, 235, 0.2), 0 5px 15px rgba(0, 0, 0, 0.02);
     animation: boxFloat 3s infinite ease-in-out;
-    /* 讓整個小框框像在水上漂浮一樣 */
 }
 
-/* 歡迎對話框的微弱上下漂浮動畫 */
 @keyframes boxFloat {
 
     0%,
@@ -245,11 +214,9 @@ header h1 {
     }
 }
 
-/* 對話框頂部的魔法棒大圖示 */
 .welcome-icon {
     font-size: 2.8rem;
     color: #ffd166;
-    /* 亮晶晶黃色 */
     margin-bottom: 15px;
     filter: drop-shadow(0 4px 0px rgba(123, 193, 235, 0.2));
 }
@@ -262,7 +229,6 @@ header h1 {
     font-weight: 800;
 }
 
-/* 溫柔的手勢小提醒文字 */
 .welcome-box p {
     font-size: 0.85rem;
     color: var(--text-sub);
@@ -273,20 +239,17 @@ header h1 {
     display: inline-block;
 }
 
-/* 升級後的 Q彈按鈕樣式調整 (在對話框內寬度變大更好按) */
 .welcome-box .btn-primary {
     width: 100%;
-    /* 讓按鈕填滿盒子，大方又好看 */
     padding: 14px;
     font-size: 1.2rem;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    /* 文字與紙飛機的距離 */
 }
 
-/* 藍色 Q彈大按鈕 */
+/* 藍色按鈕 */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
@@ -305,7 +268,6 @@ header h1 {
     box-shadow: 0 4px 0px #5ea8d4, 0 6px 10px rgba(123, 193, 235, 0.3);
 }
 
-/* 讓斯搭豆按鈕裡的 Icon 帶有微Q的擺動效果 */
 .btn-primary i {
     animation: iconWiggle 1.5s infinite ease-in-out;
 }
@@ -321,17 +283,14 @@ header h1 {
         transform: rotate(15deg) scale(1.1);
     }
 
-    /* 微微歪頭放大 */
 }
 
-/* 卡片外殼 */
 .card-wrapper {
     width: 100%;
     height: 380px;
     perspective: 1200px;
 }
 
-/* 卡片主體 */
 .card {
     width: 100%;
     height: 100%;
@@ -463,7 +422,6 @@ header h1 {
     box-shadow: 0 2px 0px #bae6fd;
 }
 
-/* 🌿 空氣感超淺滑動提示 (OO、XX 改得更透明、更柔和) */
 .card-overlay {
     position: absolute;
     top: 0;
