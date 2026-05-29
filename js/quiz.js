@@ -28,6 +28,7 @@ export function renderCurrentCard() {
     const flashCard = document.getElementById('flashCard');
     if (!flashCard) return;
 
+    // 檢查是否所有單字都練習完了
     if (currentIndex >= deck.length) {
         flashCard.innerHTML = `<div class="cardInner"><div class="cardFace cardFront"><h2>🎉 練習完成！</h2></div></div>`;
         return;
@@ -35,64 +36,108 @@ export function renderCurrentCard() {
 
     const word = deck[currentIndex];
     const frontWordEl = document.getElementById('frontWord');
-    const frontTagEl = document.getElementById('frontTag'); // 💥 新增取得標籤元素
+    const frontTagEl = document.getElementById('frontTag');
     const backWordEl = document.getElementById('backWord');
+    const backStatsEl = document.getElementById('backStats');
 
+    // 恢復卡片初始外觀，準備下一張
     flashCard.classList.remove('isFlip');
     flashCard.style.transform = '';
     flashCard.style.opacity = '1';
 
+    // 重置所有手勢遮罩透明度
     resetOverlays();
 
     // 填入中韓文內容
-    frontWordEl.textContent = word.zh;
-    backWordEl.textContent = word.kr;
+    if (frontWordEl) frontWordEl.textContent = word.zh;
+    if (backWordEl) backWordEl.textContent = word.kr;
 
-    // 💥 自動判斷詞性並加上標籤
+    // 自動判斷詞性並加上標籤
     if (frontTagEl) {
-        frontTagEl.className = 'word-tag'; // 先重置 class
-
-        // 判斷法 1：根據中文結尾是否有「的」通常是形容詞
-        // 判斷法 2：或者根據韓文有沒有空格/來判斷是動作還是狀態
+        frontTagEl.className = 'word-tag'; // 重置樣式
         if (word.zh.endsWith('的') || (word.kr.endsWith('다') && !word.kr.includes(' '))) {
-            // 這邊以你的資料庫前 6 筆（亮的、暗的、高的...）為例，符合形容詞
             frontTagEl.textContent = '形容詞';
             frontTagEl.classList.add('tag-adj');
             frontTagEl.style.display = 'inline-block';
         } else if (word.zh.includes('開') || word.zh.includes('關') || word.kr.includes(' ')) {
-            // 後 4 筆（開燈、關門...）有動作特徵，符合動詞/動詞片語
             frontTagEl.textContent = '動 詞';
             frontTagEl.classList.add('tag-verb');
-            frontTagEl.style.display = 'inline-block';
+            frontTagEl.style.with = 'inline-block';
         } else {
-            // 如果資料庫有其他不符合的，先隱藏標籤
             frontTagEl.style.display = 'none';
         }
     }
+
+    // 顯示對錯統計戰績
+    if (backStatsEl) {
+        const cc = word.correct_count || 0;
+        const wc = word.wrong_count || 0;
+        backStatsEl.textContent = `戰績： O ${cc} 次 / X ${wc} 次`;
+    }
 }
 
-// 輔助函式：重置所有遮罩
+// 輔助函式：重置所有手勢遮罩
 function resetOverlays() {
     const overlays = document.querySelectorAll('.card-overlay');
-    overlays.forEach(el => el.style.opacity = '0');
+    overlays.forEach(el => {
+        if (el) el.style.opacity = '0';
+    });
 }
 
 export async function answerCard(type) {
     const word = deck[currentIndex];
     if (!word) return;
 
+    // 徹底確保欄位初始值是數字
+    if (typeof word.correct_count !== 'number') word.correct_count = 0;
+    if (typeof word.wrong_count !== 'number') word.wrong_count = 0;
+
+    // 💥 這裡我們把 level 當作「上一次成功記憶的間隔天數 (預設0天)」
+    if (typeof word.level !== 'number') word.level = 0;
+
+    let nextIntervalDays = 1; // 下一次複習的間隔天數，預設明天複習
+
     if (type === 'known') {
-        word.level = (word.level || 0) + 1;
+        // 【右滑：熟悉】
+        word.correct_count += 1;
+
+        // 依照經典 SM-2 記憶曲線規律：
+        if (word.level === 0) {
+            nextIntervalDays = 1;  // 第一次答對，1天後複習
+        } else if (word.level === 1) {
+            nextIntervalDays = 4;  // 第二次答對，4天後複習
+        } else {
+            // 之後每次答對，時間間隔都放大 2.2 倍 (等比級數增加，例如 4 -> 9 -> 20 -> 44天)
+            nextIntervalDays = Math.round(word.level * 2.2);
+        }
+
+        // 把這次的間隔天數記在 level 欄位，留給下一次計算用
+        word.level = nextIntervalDays;
+
     } else if (type === 'weak') {
-        word.level = Math.max((word.level || 0) - 1, 0);
+        // 【左滑：不熟】
+        word.wrong_count += 1;
+        word.level = 0;       // 忘記了，間隔天數重置
+        nextIntervalDays = 1;  // 明天立刻重新複習
+
     } else if (type === 'unsure') {
-        word.level = 0;
+        // 【下滑：不確定】
+        word.wrong_count += 1;
+        word.level = 0;       // 不確定，當作忘記重置
+        nextIntervalDays = 1;  // 明天立刻重新複習
     }
 
-    word.next_review_at = new Date(Date.now() + (24 * 60 * 60 * 1000 * ((word.level || 1) * 2)));
+    // 💥 精確計算下一次複習的日期時間
+    word.next_review_at = new Date(Date.now() + (24 * 60 * 60 * 1000 * nextIntervalDays));
 
-    await saveWordProgress(word);
-    console.log(`答題: ${type}`, word);
+    console.log(`[科學記憶曲線] 單字: ${word.zh} | 下一次將在 ${nextIntervalDays} 天後複習`);
+
+    try {
+        await saveWordProgress(word);
+        console.log(`✅ 資料庫同步成功!`);
+    } catch (err) {
+        console.error('❌ 寫入資料庫發生錯誤:', err);
+    }
 
     currentIndex++;
     renderCurrentCard();
@@ -114,7 +159,6 @@ export function attachCardEvents() {
     const flashCard = document.getElementById('flashCard');
     const ttsBtn = document.getElementById('ttsBtn');
 
-    // 取得三個圖示元素
     const overlayKnown = document.querySelector('.overlay-known');
     const overlayWeak = document.querySelector('.overlay-weak');
     const overlayUnsure = document.querySelector('.overlay-unsure');
@@ -137,7 +181,7 @@ export function attachCardEvents() {
     let startX = 0;
     let startY = 0;
     let isDragging = false;
-    const threshold = 120; // 判定門檻
+    const threshold = 120;
 
     flashCard.onpointerdown = (e) => {
         if (e.target.closest('#ttsBtn')) return;
@@ -154,26 +198,18 @@ export function attachCardEvents() {
         const moveX = e.clientX - startX;
         const moveY = e.clientY - startY;
 
-        // 卡片跟隨手指移動與旋轉
         flashCard.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${moveX * 0.05}deg)`;
 
-        // 先重置透明度
         resetOverlays();
 
-        // 動態計算手勢強度的透明度 (最高到 1)
         if (Math.abs(moveY) > Math.abs(moveX)) {
-            // 上下移動為主
             if (moveY > 0 && overlayUnsure) {
-                // 下滑：顯示不確定三角形
                 overlayUnsure.style.opacity = Math.min(moveY / threshold, 1);
             }
         } else {
-            // 左右移動為主
             if (moveX > 0 && overlayKnown) {
-                // 右滑：顯示熟悉圈圈
                 overlayKnown.style.opacity = Math.min(moveX / threshold, 1);
             } else if (moveX < 0 && overlayWeak) {
-                // 左滑：顯示不熟叉叉
                 overlayWeak.style.opacity = Math.min(Math.abs(moveX) / threshold, 1);
             }
         }
@@ -189,7 +225,6 @@ export function attachCardEvents() {
 
         flashCard.style.transition = 'all 0.3s ease-out';
 
-        // 判斷手勢終點
         if (Math.abs(moveY) > Math.abs(moveX) && moveY > threshold) {
             flashCard.style.transform = 'translateY(100vh)';
             flashCard.style.opacity = '0';
@@ -206,7 +241,6 @@ export function attachCardEvents() {
             setTimeout(() => answerCard('weak'), 250);
         }
         else {
-            // 沒過門檻，彈回並淡出圖示
             flashCard.style.transform = '';
             resetOverlays();
         }

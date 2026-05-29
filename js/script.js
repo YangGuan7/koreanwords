@@ -11,5 +11,7 @@ async function startApp() {
     await initWords();
     startStudy(getWords());
 }
+import { resetAllWordProgress } from './pushData.js';
+document.getElementById('resetBtn').addEventListener('click', resetAllWordProgress);
 
 document.getElementById('startBtn').addEventListener('click', startApp);
