@@ -41,10 +41,15 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    overflow: hidden;
-    letter-spacing: 0.5px;
 
-    /* 網格漸層基礎 */
+    /* 💥 核心修正 1：防止手機瀏覽器橡皮筋特效與側滑返回 */
+    overflow: hidden;
+    touch-action: none;
+    position: fixed;
+    /* 鎖死底層，不讓網頁隨手指滾動 */
+    width: 100%;
+    height: 100%;
+
     background-color: var(--bg-color);
     background-image:
         linear-gradient(rgba(123, 193, 235, 0.06) 1.5px, transparent 1.5px),
@@ -52,8 +57,6 @@ body {
         radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.6) 0%, transparent 40%),
         radial-gradient(circle at 80% 80%, #e0f2fe 0%, transparent 50%);
     background-size: 24px 24px, 24px 24px, 100% 100%, 100% 100%;
-
-    position: relative;
 }
 
 /* 💥 實心大星星群：往中間收攏，完美點綴在卡片左右空隙 */
