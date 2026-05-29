@@ -1,30 +1,33 @@
 import { initWords, getWords, startStudy } from './quiz.js';
+import { resetAllWordProgress } from './pushData.js';
 
 async function startApp() {
     const welcomeScreen = document.getElementById('welcomeScreen');
     const flashCard = document.getElementById('flashCard');
 
-    // 1. 觸發歡迎畫面的 Q 彈淡出縮小動畫
+    // 1. 取得使用者選了什麼主題
+    const themeSelect = document.getElementById('themeSelect');
+    const selectedTheme = themeSelect ? themeSelect.value : 'all';
+
+    // 2. 觸發歡迎畫面的淡出動畫
     if (welcomeScreen) {
         welcomeScreen.classList.add('fade-out');
     }
 
-    // 2. 初始化單字資料庫
+    // 3. 初始化單字資料庫
     await initWords();
 
-    // 3. 延遲 300 毫秒（等歡迎畫面播到一半時），讓單字卡帶有魔法般由下往上浮現登場
+    // 4. 延遲 300 毫秒等歡迎畫面動畫播完後正式啟動
     setTimeout(() => {
         if (welcomeScreen) {
-            welcomeScreen.style.display = 'none'; // 動化播完後正式移除
+            welcomeScreen.style.display = 'none';
         }
 
-        // 啟動刷卡機制
-        startStudy(getWords());
+        // 啟動刷卡機制，並傳入選定的主題
+        startStudy(getWords(), selectedTheme);
 
-        // 幫剛登場的卡片加上浮現動畫 Class
         if (flashCard) {
             flashCard.classList.add('card-appear');
-            // 動畫播完後把 Class 拔掉，才不會干擾後續左右滑動的手勢
             setTimeout(() => {
                 flashCard.classList.remove('card-appear');
             }, 600);
@@ -32,4 +35,15 @@ async function startApp() {
     }, 300);
 }
 
+// 綁定開始按鈕
 document.getElementById('startBtn').addEventListener('click', startApp);
+
+// 綁定清空進度按鈕
+const resetBtn = document.getElementById('resetBtn');
+if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+        if (confirm('確定要大洗白，將所有單字的記憶進度歸零重新開始嗎？')) {
+            resetAllWordProgress();
+        }
+    });
+}

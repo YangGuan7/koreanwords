@@ -19,20 +19,21 @@ export async function initPublicWords() {
     return data || [];
 }
 
-// 💥 修正後的儲存函式（改用 id 來判斷 ON CONFLICT）
+// 儲存單字進度（包含詞性與主題標籤防護）
 export async function saveWordProgress(word) {
     const updateData = {
-        id: word.id,                           // 使用原有的 id 做主鍵對應
+        id: word.id,
         user_id: PUBLIC_USER_ID,
         zh: word.zh,
         kr: word.kr,
+        category: word.category,
+        theme: word.theme || '未分類',
         level: word.level || 0,
         correct_count: word.correct_count || 0,
         wrong_count: word.wrong_count || 0,
         next_review_at: word.next_review_at
     };
 
-    // 💥 這裡把 onConflict 改為 'id'
     const { data, error } = await supabase
         .from('user_vocab_progress')
         .upsert(updateData, { onConflict: 'id' });
@@ -44,6 +45,7 @@ export async function saveWordProgress(word) {
     return data;
 }
 
+// 載入進度
 export async function loadWordProgress() {
     const { data, error } = await supabase
         .from('user_vocab_progress')
@@ -58,11 +60,8 @@ export async function loadWordProgress() {
     return data || [];
 }
 
-// 💥 秘密武器：一鍵將所有單字的學習進度全部歸零
+// 一鍵將所有單字的學習進度全部歸零
 export async function resetAllWordProgress() {
-    const PUBLIC_USER_ID = 'public';
-
-    // 抓出目前所有的單字
     const { data: words, error: fetchError } = await supabase
         .from('user_vocab_progress')
         .select('id')
@@ -73,14 +72,13 @@ export async function resetAllWordProgress() {
         return;
     }
 
-    // 將所有單字的對錯、等級、複習時間全部洗白
     const resetData = words.map(word => ({
         id: word.id,
         user_id: PUBLIC_USER_ID,
         level: 0,
         correct_count: 0,
         wrong_count: 0,
-        next_review_at: null // 複習時間清空，等同於全新的單字
+        next_review_at: null
     }));
 
     const { error: updateError } = await supabase
@@ -92,6 +90,6 @@ export async function resetAllWordProgress() {
     } else {
         console.log('🎉 所有單字記憶進度已成功清空歸零！');
         alert('進度已完全清空，可以重新開始囉！');
-        window.location.reload(); // 自動重新整理網頁刷新畫面
+        window.location.reload();
     }
 }

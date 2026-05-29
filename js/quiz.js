@@ -13,24 +13,120 @@ export async function initWords() {
 
 export function getWords() { return words; }
 
-export function startStudy(customDeck) {
-    deck = customDeck ? [...customDeck] : [...words];
+// 接收並過濾主題
+export function startStudy(customDeck, selectedTheme = 'all') {
+    let finalDeck = customDeck ? [...customDeck] : [...words];
+
+    // 如果使用者有選特定主題，就用陣列的 filter 過濾
+    if (selectedTheme !== 'all') {
+        finalDeck = finalDeck.filter(word => word.theme === selectedTheme);
+    }
+
+    deck = finalDeck;
     currentIndex = 0;
 
     const flashCard = document.getElementById('flashCard');
-    if (flashCard) flashCard.classList.remove('hide');
+    if (flashCard) {
+        flashCard.classList.remove('hide');
+        flashCard.style.transform = ''; // 確保重刷時卡片位置歸零
+        flashCard.style.opacity = '1';
+    }
+
+    // 防呆：如果該主題剛好沒有任何單字，給個提示
+    if (deck.length === 0) {
+        if (flashCard) flashCard.innerHTML = `<div class="cardInner"><div class="cardFace cardFront"><h2>📭 這個主題目前沒單字喔！</h2></div></div>`;
+        return;
+    }
 
     renderCurrentCard();
     attachCardEvents();
 }
 
+// 渲染當前單字卡（包含練習完成後的「再次複習」按鈕邏輯）
 export function renderCurrentCard() {
     const flashCard = document.getElementById('flashCard');
     if (!flashCard) return;
 
-    // 檢查是否所有單字都練習完了
+    // 💥 檢查是否所有單字都練習完了
     if (currentIndex >= deck.length) {
-        flashCard.innerHTML = `<div class="cardInner"><div class="cardFace cardFront"><h2>🎉 練習完成！</h2></div></div>`;
+        // 💥 關鍵修正 1：移除卡片上的拖曳與翻面點擊事件，並將卡片的位置、角度與透明度「強制歸零回中央」！
+        removeCardEvents();
+        flashCard.style.transform = 'translate(0, 0) rotate(0deg)';
+        flashCard.style.opacity = '1';
+        flashCard.classList.remove('isFlip');
+
+        flashCard.innerHTML = `
+            <div class="cardInner">
+                <div class="cardFace cardFront" style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 15px; width: 100%; height: 100%;">
+                    <h2 style="margin: 0; font-size: 24px;">🎉 練習完成！</h2>
+                    <p style="font-size: 14px; color: #666; margin: 0;">這輪的單字都滑完囉！</p>
+                    <button id="retryBtn" style="
+                        padding: 10px 25px; 
+                        background: #ffde6a; 
+                        border: none; 
+                        border-radius: 20px; 
+                        font-family: inherit; 
+                        font-size: 16px; 
+                        font-weight: bold; 
+                        color: #333;
+                        cursor: pointer; 
+                        box-shadow: 0 4px 0 #e6c55f;
+                        transition: transform 0.1s;
+                        margin-top: 10px;
+                        z-index: 999;
+                    ">
+                        <i class="fa-solid fa-rotate-right"></i> 再次複習
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // 💥 動態綁定「再次複習」按鈕的點擊事件
+        const retryBtn = document.getElementById('retryBtn');
+        if (retryBtn) {
+            // 按下按鈕時的按壓反饋特效
+            retryBtn.onpointerdown = (e) => {
+                e.stopPropagation();
+                retryBtn.style.transform = 'translateY(2px)';
+            };
+            retryBtn.onpointerup = (e) => {
+                e.stopPropagation();
+                retryBtn.style.transform = 'none';
+            };
+
+            retryBtn.onclick = (e) => {
+                e.stopPropagation(); // 防止事件向上冒泡
+
+                // 重新還原卡片原本的正反面 HTML 結構與發音按鈕
+                flashCard.innerHTML = `
+                    <button id="ttsBtn" class="tts-btn" aria-label="發音">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <div class="card-overlay overlay-known"><i class="fa-regular fa-circle"></i></div>
+                    <div class="card-overlay overlay-weak"><i class="fa-solid fa-xmark"></i></div>
+                    <div class="card-overlay overlay-unsure"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="cardInner">
+                        <div class="cardFace cardFront">
+                            <div class="word-tag" id="frontTag"></div>
+                            <div class="word-text" id="frontWord">中文</div>
+                            <div class="tap-hint">★ 點擊翻面 ★</div>
+                        </div>
+                        <div class="cardFace cardBack">
+                            <div class="word-text" id="backWord">KR</div>
+                            <div class="word-stats" id="backStats"></div>
+                            <div class="tap-hint">★ 點擊翻回 ★</div>
+                        </div>
+                    </div>
+                `;
+
+                // 自動抓取當前畫面上選單的主題，無縫開啟同主題新局
+                const themeSelect = document.getElementById('themeSelect');
+                const selectedTheme = themeSelect ? themeSelect.value : 'all';
+
+                // 重新初始化單字本，並會在裡面重新綁定 attachCardEvents()
+                startStudy(getWords(), selectedTheme);
+            };
+        }
         return;
     }
 
@@ -40,36 +136,33 @@ export function renderCurrentCard() {
     const backWordEl = document.getElementById('backWord');
     const backStatsEl = document.getElementById('backStats');
 
-    // 恢復卡片初始外觀，準備下一張
+    // 重置卡片旋轉與透明度
     flashCard.classList.remove('isFlip');
     flashCard.style.transform = '';
     flashCard.style.opacity = '1';
 
-    // 重置所有手勢遮罩透明度
     resetOverlays();
 
-    // 填入中韓文內容
     if (frontWordEl) frontWordEl.textContent = word.zh;
     if (backWordEl) backWordEl.textContent = word.kr;
 
-    // 自動判斷詞性並加上標籤
+    // 建立雙標籤徽章 (直接吃資料庫的 category 與 theme)
     if (frontTagEl) {
-        frontTagEl.className = 'word-tag'; // 重置樣式
-        // 在 quiz.js 的 renderCurrentCard 裡找到對應地方修改：
-        if (word.zh.endsWith('的') || (word.kr.endsWith('다') && !word.kr.includes(' '))) {
-            frontTagEl.textContent = '✨ 形容詞 ✨'; // 💥 加顆小星星
-            frontTagEl.classList.add('tag-adj');
-            frontTagEl.style.display = 'inline-block';
-        } else if (word.zh.includes('開') || word.zh.includes('關') || word.kr.includes(' ')) {
-            frontTagEl.textContent = '✨ 動 詞 ✨';  // 💥 加顆小星星
-            frontTagEl.classList.add('tag-verb');
-            frontTagEl.style.display = 'inline-block';
-        } else {
-            frontTagEl.style.display = 'none';
+        frontTagEl.className = 'word-tag';
+        frontTagEl.innerHTML = '';
+
+        let tagsHTML = '';
+        if (word.category) {
+            tagsHTML += `<span class="badge-cat" style="background:#ffde6a; color:#333; padding:2px 8px; margin-right:5px; border-radius:10px; font-size:12px; font-weight:bold;">${word.category}</span>`;
         }
+        if (word.theme && word.theme !== '未分類') {
+            tagsHTML += `<span class="badge-theme" style="background:#a0e7e5; color:#333; padding:2px 8px; border-radius:10px; font-size:12px; font-weight:bold;">${word.theme}</span>`;
+        }
+
+        frontTagEl.innerHTML = tagsHTML;
+        frontTagEl.style.display = tagsHTML ? 'inline-block' : 'none';
     }
 
-    // 顯示對錯統計戰績
     if (backStatsEl) {
         const cc = word.correct_count || 0;
         const wc = word.wrong_count || 0;
@@ -77,7 +170,6 @@ export function renderCurrentCard() {
     }
 }
 
-// 輔助函式：重置所有手勢遮罩
 function resetOverlays() {
     const overlays = document.querySelectorAll('.card-overlay');
     overlays.forEach(el => {
@@ -89,49 +181,33 @@ export async function answerCard(type) {
     const word = deck[currentIndex];
     if (!word) return;
 
-    // 徹底確保欄位初始值是數字
     if (typeof word.correct_count !== 'number') word.correct_count = 0;
     if (typeof word.wrong_count !== 'number') word.wrong_count = 0;
-
-    // 💥 這裡我們把 level 當作「上一次成功記憶的間隔天數 (預設0天)」
     if (typeof word.level !== 'number') word.level = 0;
 
-    let nextIntervalDays = 1; // 下一次複習的間隔天數，預設明天複習
+    let nextIntervalDays = 1;
 
     if (type === 'known') {
-        // 【右滑：熟悉】
         word.correct_count += 1;
-
-        // 依照經典 SM-2 記憶曲線規律：
         if (word.level === 0) {
-            nextIntervalDays = 1;  // 第一次答對，1天後複習
+            nextIntervalDays = 1;
         } else if (word.level === 1) {
-            nextIntervalDays = 4;  // 第二次答對，4天後複習
+            nextIntervalDays = 4;
         } else {
-            // 之後每次答對，時間間隔都放大 2.2 倍 (等比級數增加，例如 4 -> 9 -> 20 -> 44天)
             nextIntervalDays = Math.round(word.level * 2.2);
         }
-
-        // 把這次的間隔天數記在 level 欄位，留給下一次計算用
         word.level = nextIntervalDays;
-
     } else if (type === 'weak') {
-        // 【左滑：不熟】
         word.wrong_count += 1;
-        word.level = 0;       // 忘記了，間隔天數重置
-        nextIntervalDays = 1;  // 明天立刻重新複習
-
+        word.level = 0;
+        nextIntervalDays = 1;
     } else if (type === 'unsure') {
-        // 【下滑：不確定】
         word.wrong_count += 1;
-        word.level = 0;       // 不確定，當作忘記重置
-        nextIntervalDays = 1;  // 明天立刻重新複習
+        word.level = 0;
+        nextIntervalDays = 1;
     }
 
-    // 💥 精確計算下一次複習的日期時間
     word.next_review_at = new Date(Date.now() + (24 * 60 * 60 * 1000 * nextIntervalDays));
-
-    console.log(`[科學記憶曲線] 單字: ${word.zh} | 下一次將在 ${nextIntervalDays} 天後複習`);
 
     try {
         await saveWordProgress(word);
@@ -156,6 +232,17 @@ function speakKorean(text) {
     }
 }
 
+// 清除卡片手動控制事件的防護機制
+function removeCardEvents() {
+    const flashCard = document.getElementById('flashCard');
+    if (!flashCard) return;
+    flashCard.onclick = null;
+    flashCard.onpointerdown = null;
+    flashCard.onpointermove = null;
+    flashCard.onpointerup = null;
+    flashCard.onpointercancel = null;
+}
+
 export function attachCardEvents() {
     const flashCard = document.getElementById('flashCard');
     const ttsBtn = document.getElementById('ttsBtn');
@@ -166,6 +253,9 @@ export function attachCardEvents() {
 
     if (!flashCard) return;
 
+    // 先清除舊有的，確保不重複綁定
+    removeCardEvents();
+
     if (ttsBtn) {
         ttsBtn.onclick = (e) => {
             e.stopPropagation();
@@ -175,7 +265,7 @@ export function attachCardEvents() {
     }
 
     flashCard.onclick = (e) => {
-        if (e.target.closest('#ttsBtn')) return;
+        if (e.target.closest('#ttsBtn') || e.target.closest('#retryBtn')) return;
         flashCard.classList.toggle('isFlip');
     };
 
@@ -185,8 +275,7 @@ export function attachCardEvents() {
     const threshold = 120;
 
     flashCard.onpointerdown = (e) => {
-        if (e.target.closest('#ttsBtn')) return;
-
+        if (e.target.closest('#ttsBtn') || e.target.closest('#retryBtn')) return;
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
