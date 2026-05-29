@@ -1,125 +1,26 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>韓文背單字卡</title>
-  <link rel="stylesheet" href="./Content/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>韓文刷卡單字</title>
+<link rel="stylesheet" href="./Content/style.css">
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <h1>韓文滑卡背單字</h1>
-      <p>按「開始練習」後一次只顯示一張卡。點卡片翻面，右上角可以聽發音；左滑代表忘記，右滑代表記得，中間按鈕代表不熟。</p>
-    </section>
+<h1>韓文單字刷卡</h1>
 
-    <section class="topbar">
-      <div class="field">
-        <label for="searchInput">搜尋單字</label>
-        <input id="searchInput" class="input" type="text" placeholder="輸入中文、韓文都可以" />
-      </div>
-
-      <div class="field">
-        <label for="categoryFilter">練習類別</label>
-        <select id="categoryFilter" class="select">
-          <option value="all">全部</option>
-          <option value="形容詞">形容詞</option>
-          <option value="動作">動作</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="frontMode">正面顯示</label>
-        <select id="frontMode" class="select">
-          <option value="zh">中文，看你能不能想出韓文</option>
-          <option value="ko">韓文，看你能不能想出中文</option>
-        </select>
-      </div>
-    </section>
-
-    <main class="studyShell">
-      <div class="studyHead">
-        <div class="studyTitle">
-          <strong id="modeTitle">準備開始</strong>
-          <span id="modeDesc">像刷卡片一樣，一次只專心記一個字。</span>
-        </div>
-        <div class="countPill">
-          <span id="currentNum">0</span> / <span id="totalNum">0</span>
-        </div>
-      </div>
-
-      <section class="stage" id="stage">
-        <div class="sideHint sideHint-left">← X 忘記</div>
-        <div class="sideHint sideHint-right">O 記得 →</div>
-
-        <div class="startPanel" id="startPanel">
-          <h2>準備好了嗎？</h2>
-          <p>按下開始後，先看正面猜答案。想確認時點一下卡片翻面，不要急著看答案，讓大腦先找路。</p>
-          <button class="btn btnPrimary" id="startBtn" type="button">開始練習</button>
-        </div>
-
-        <div class="card hide" id="flashCard" role="button" tabindex="0" aria-label="單字卡，點擊可翻面">
-          <button class="speakBtn" id="speakBtn" type="button" aria-label="播放韓文發音">🔊</button>
-          <div class="cardInner">
-            <div class="cardFace cardFront">
-              <div class="tag" id="frontTag">類別</div>
-              <div class="wordBox">
-                <div id="frontWord" class="zh">中文</div>
-                <div id="frontSub" class="roman">先想答案</div>
-              </div>
-              <div class="hint">點一下卡片翻面</div>
-            </div>
-
-            <div class="cardFace cardBack">
-              <div class="tag" id="backTag">答案</div>
-              <div class="wordBox">
-                <div id="backWord" class="ko">韓文</div>
-                <div id="backSub" class="roman">發音提示</div>
-              </div>
-              <div class="hint">記得就右滑，不記得就左滑，不穩就按不熟</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="finishPanel hide" id="finishPanel">
-          <h2>這輪完成！</h2>
-          <p>下面是這次練習結果，不熟跟忘記的字可以再單獨刷一次。</p>
-          <div class="resultGrid">
-            <div class="resultItem"><strong id="knownCount">0</strong><span>記得</span></div>
-            <div class="resultItem"><strong id="weakCount">0</strong><span>不熟</span></div>
-            <div class="resultItem"><strong id="forgotCount">0</strong><span>忘記</span></div>
-          </div>
-          <button class="btn btnPrimary" id="restartBtn" type="button">再練一次</button>
-        </div>
-      </section>
-
-      <div class="judgeBar">
-        <button class="judgeBtn forgotBtn" id="forgotBtn" type="button">X 忘記</button>
-        <button class="judgeBtn weakBtn" id="weakBtn" type="button">- 不熟</button>
-        <button class="judgeBtn knownBtn" id="knownBtn" type="button">O 記得</button>
-      </div>
-
-      <div class="utilityBar">
-        <button class="btn" id="shuffleBtn" type="button">洗牌</button>
-        <button class="btn" id="practiceWeakBtn" type="button">只練不熟＋忘記</button>
-        <button class="btn" id="resetDefaultBtn" type="button">重設預設單字</button>
-      </div>
-    </main>
-
-    <section class="editor">
-      <h2>自己加單字</h2>
-      <p>
-        一行一張卡，格式：中文｜韓文｜羅馬拼音｜類別<br>
-        例如：漂亮的｜예쁘다｜ye-ppeu-da｜形容詞
-      </p>
-      <textarea id="bulkInput" class="textarea" placeholder="中文｜韓文｜羅馬拼音｜類別"></textarea>
-      <div class="editorActions">
-        <button class="btn btnPrimary" id="addWordsBtn" type="button">加入單字卡</button>
-        <button class="btn" id="clearAllBtn" type="button">清空全部單字</button>
-      </div>
-    </section>
+<div class="card hide" id="flashCard">
+  <div class="cardInner">
+    <div class="cardFace cardFront" id="frontWord">中文</div>
+    <div class="cardFace cardBack" id="backWord">KR</div>
   </div>
+</div>
 
-  <script src="./js/script.js"></script>
+<button id="startBtn">開始練習</button>
+
+<script type="module" src="./js/firebase.js"></script>
+<script type="module" src="./js/pushData.js"></script>
+<script type="module" src="./js/quiz.js"></script>
+<script type="module" src="./js/script.js"></script>
 </body>
 </html>

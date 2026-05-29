@@ -1,26 +1,67 @@
-import { fetchData } from './firebase.js'; // 正確導入 fetchData 函數
+import { initPublicWords, saveWordProgress } from './pushData.js';
 
-// 使用 fetchData 函數來讀取資料
-fetchData().then((data) => {
-    console.log("讀取到的資料：", data);
+let words = [];
+let deck = [];
+let currentIndex = 0;
 
-    // 假設 data 是包含單字的物件，你可以在這裡處理並渲染測驗題目
-    // 例如：
-    const wordList = Object.keys(data); // 取得單字的鍵值陣列（例如：apple, run）
+export async function initWords() {
+    words = await initPublicWords();
+    console.log('初始化抓到單字:', words); // 🔹 顯示資料庫單字
+    deck = [...words];
+    return words;
+}
 
-    // 隨便選擇一個單字並顯示其中文和韓文
-    const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-    const wordData = data[randomWord];
+export function getWords() { return words; }
 
-    console.log(`隨機選擇單字：${randomWord}`);
-    console.log(`中文：${wordData.中文}, 韓文：${wordData.韓文}`);
+export function startStudy(customDeck) {
+    deck = customDeck ? [...customDeck] : [...words];
+    currentIndex = 0;
+    renderCurrentCard();
+    attachCardEvents();
+}
 
-    // 你可以把資料顯示到頁面上
-    document.body.innerHTML = `
-        <p>單字: ${randomWord}</p>
-        <p>中文: ${wordData.中文}</p>
-        <p>韓文: ${wordData.韓文}</p>
-    `;
-}).catch((error) => {
-    console.error("資料讀取錯誤：", error);
-});
+export function renderCurrentCard() {
+    const word = deck[currentIndex];
+    if (!word) return;
+
+    const frontWordEl = document.getElementById('frontWord');
+    const backWordEl = document.getElementById('backWord');
+
+    frontWordEl.textContent = word.zh;
+    backWordEl.textContent = word.kr;
+}
+
+export async function answerCard(type) {
+    const word = deck[currentIndex];
+    if (!word) return;
+
+    if (type === 'known') word.level = (word.level || 0) + 1;
+    if (type === 'weak') word.level = Math.max((word.level || 0) - 1, 0);
+    if (type === 'forgot') word.level = 0;
+
+    word.next_review_at = new Date(Date.now() + (24 * 60 * 60 * 1000 * ((word.level || 1) * 2)));
+
+    await saveWordProgress(word);
+
+    console.log(`答題: ${type}`, word); // 🔹 顯示這次答題結果
+
+    currentIndex++;
+    renderCurrentCard();
+}
+
+export function attachCardEvents() {
+    const flashCard = document.getElementById('flashCard');
+
+    flashCard.addEventListener('click', () => flashCard.classList.toggle('isFlip'));
+
+    let startX = 0, isDragging = false;
+    flashCard.addEventListener('pointerdown', e => {
+        isDragging = true; startX = e.clientX; flashCard.setPointerCapture(e.pointerId);
+    });
+    flashCard.addEventListener('pointerup', e => {
+        if (!isDragging) return; isDragging = false;
+        const moveX = e.clientX - startX;
+        if (moveX > 100) { answerCard('known'); }
+        else if (moveX < -100) { answerCard('forgot'); }
+    });
+}
